@@ -1,5 +1,3 @@
-Certainly! Below is a sample documentation that outlines how to run the application, interact with its API endpoints, and any considerations regarding authentication if it's implemented in your library management system.
-
 ---
 
 ## Library Management System API Documentation
