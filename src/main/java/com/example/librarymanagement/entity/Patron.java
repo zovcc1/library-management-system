@@ -40,6 +40,11 @@ public class Patron {
     @Column(name = "membership_date", nullable = false)
     @DateTimeFormat(pattern = "dd/mm/yyyy")
     private LocalDate membershipDate;
-
+    @PrePersist
+    protected void onCreate(){
+        if (membershipDate == null){
+            membershipDate = LocalDate.now();
+        }
+    }
 
 }

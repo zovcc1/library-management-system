@@ -4,37 +4,38 @@ import com.example.librarymanagement.dto.BookDto;
 import com.example.librarymanagement.entity.Book;
 import com.example.librarymanagement.exception.BookAlreadyExistsException;
 import com.example.librarymanagement.exception.BookNotFoundException;
-import com.example.librarymanagement.mapper.BookMapper;
 import com.example.librarymanagement.repository.BookRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
 public class BookService {
 
     private final BookRepository bookRepository;
-    private final BookMapper bookMapper;
+    private final ModelMapper modelMapper;
 
-    @Autowired
-    public BookService(BookRepository bookRepository, BookMapper bookMapper) {
+    public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
         this.bookRepository = bookRepository;
-        this.bookMapper = bookMapper;
+        this.modelMapper = modelMapper;
     }
 
     public List<BookDto> findAllBooks() {
         List<Book> books = bookRepository.findAll();
-        return bookMapper.toDtoList(books);
+        return books.stream()
+                .map(book -> modelMapper.map(book, BookDto.class))
+                .collect(Collectors.toList());
     }
 
     public BookDto findBookById(Long id) {
         Book book = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
-        return bookMapper.toDto(book);
+        return modelMapper.map(book, BookDto.class);
     }
 
     public BookDto addBook(BookDto bookDto) {
@@ -42,9 +43,9 @@ public class BookService {
         if (existingBook.isPresent()) {
             throw new BookAlreadyExistsException("Book with the same ISBN and title already exists");
         }
-        Book book = bookMapper.toEntity(bookDto);
+        Book book = modelMapper.map(bookDto, Book.class);
         Book newBook = bookRepository.save(book);
-        return bookMapper.toDto(newBook);
+        return modelMapper.map(newBook, BookDto.class);
     }
 
     public BookDto updateBook(Long id, BookDto bookDto) {
@@ -57,10 +58,9 @@ public class BookService {
             throw new BookAlreadyExistsException("A book with the same ISBN already exists.");
         }
 
-        bookMapper.updateBookFromDto(bookDto, existingBook);
-
+        modelMapper.map(bookDto, existingBook);
         Book updatedBook = bookRepository.save(existingBook);
-        return bookMapper.toDto(updatedBook);
+        return modelMapper.map(updatedBook, BookDto.class);
     }
 
     public void deleteBook(Long id) {
