@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -17,6 +18,7 @@ import java.util.Date;
 @Table(name = "PATRON_TABLE")
 @NoArgsConstructor
 @AllArgsConstructor
+@Builder
 public class Patron {
     @Id
     @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "patron_seq_gen")
