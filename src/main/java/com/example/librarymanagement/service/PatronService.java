@@ -25,31 +25,26 @@ public class PatronService {
 
     public List<PatronDto> findAllPatrons() {
         List<Patron> patrons = patronRepository.findAll();
-        return patrons.stream().map(patron -> modelMapper.map(patron , PatronDto.class))
+        return patrons.stream().map(patron -> modelMapper.map(patron, PatronDto.class))
                 .collect(Collectors.toList());
     }
 
     public PatronDto findPatronById(Long id) {
         Patron patron = patronRepository.findById(id)
                 .orElseThrow(() -> new NoPatronFoundException("No patron found with id: " + id));
-        return modelMapper.map(patron ,  PatronDto.class);
+        return modelMapper.map(patron, PatronDto.class);
     }
 
     public PatronDto addPatron(PatronDto patronDto) {
-        // Check if a patron with the same phone number or email already exists
         Optional<Patron> existingPatron = patronRepository.findByPhoneNumberAndEmail(patronDto.getPhoneNumber(), patronDto.getEmail());
         if (existingPatron.isPresent()) {
-            // Throw an exception if the patron already exists
             throw new PatronAlreadyExistsException("Patron already found with the same number or email.");
         }
 
-        // Map the PatronDto to a Patron entity
         Patron newPatron = modelMapper.map(patronDto, Patron.class);
 
-        // Save the new patron entity to the repository
         newPatron = patronRepository.save(newPatron);
 
-        // Map the saved Patron entity back to a PatronDto
         return modelMapper.map(newPatron, PatronDto.class);
     }
 
@@ -65,7 +60,7 @@ public class PatronService {
         modelMapper.map(patronDto, existingPatron);
 
         Patron updatedPatron = patronRepository.save(existingPatron);
-        return modelMapper.map(updatedPatron , PatronDto.class);
+        return modelMapper.map(updatedPatron, PatronDto.class);
     }
 
     public void deletePatron(Long id) {

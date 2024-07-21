@@ -27,7 +27,7 @@ public class BorrowingRecord {
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "borrow_date", nullable = false)
-    private LocalDate  borrowDate;
+    private LocalDate borrowDate;
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "return_date")
@@ -36,6 +36,7 @@ public class BorrowingRecord {
     @Column(name = "status", length = 20)
     @Enumerated(EnumType.STRING)
     private BorrowingStatus status;
+
     @PrePersist
     @PreUpdate
     public void validateReturnDate() {
@@ -43,7 +44,6 @@ public class BorrowingRecord {
             throw new InvalidReturnDateException("Return date cannot be before borrow date");
         }
     }
-
 
 
 }

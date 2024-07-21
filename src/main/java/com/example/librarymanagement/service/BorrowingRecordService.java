@@ -14,7 +14,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @Service
 public class BorrowingRecordService {
@@ -44,7 +43,7 @@ public class BorrowingRecordService {
         borrowingRecord.setStatus(BorrowingStatus.BORROWED);
 
         BorrowingRecord savedRecord = borrowingRecordRepository.save(borrowingRecord);
-        return modelMapper.map(savedRecord , BorrowingRecordDto.class);
+        return modelMapper.map(savedRecord, BorrowingRecordDto.class);
     }
 
     public BorrowingRecordDto returnBook(Long bookId, Long patronId) {
@@ -56,6 +55,6 @@ public class BorrowingRecordService {
         borrowingRecord.setStatus(BorrowingStatus.RETURNED);
 
         BorrowingRecord savedRecord = borrowingRecordRepository.save(borrowingRecord);
-        return modelMapper.map(savedRecord,BorrowingRecordDto.class);
+        return modelMapper.map(savedRecord, BorrowingRecordDto.class);
     }
 }

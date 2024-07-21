@@ -5,8 +5,6 @@ import com.example.librarymanagement.exception.BookAlreadyExistsException;
 import com.example.librarymanagement.exception.BookNotFoundException;
 import com.example.librarymanagement.service.BookService;
 import lombok.extern.slf4j.Slf4j;
-import lombok.extern.slf4j.XSlf4j;
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,7 +16,7 @@ import java.util.List;
 @RequestMapping("/api/books")
 @Slf4j
 public class BookController {
-   @Autowired
+    @Autowired
     private final BookService bookService;
 
 

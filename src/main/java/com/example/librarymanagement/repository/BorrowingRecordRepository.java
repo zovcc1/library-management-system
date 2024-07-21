@@ -8,7 +8,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface BorrowingRecordRepository extends JpaRepository<BorrowingRecord,Long> {
+public interface BorrowingRecordRepository extends JpaRepository<BorrowingRecord, Long> {
 
     Optional<BorrowingRecord> findByBookIdAndPatronIdAndStatus(Long book_id, Long patron_id, BorrowingStatus status);
 }

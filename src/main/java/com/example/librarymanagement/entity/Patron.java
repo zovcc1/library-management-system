@@ -1,6 +1,5 @@
 package com.example.librarymanagement.entity;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
@@ -11,7 +10,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.format.annotation.NumberFormat;
 
 import java.time.LocalDate;
-import java.util.Date;
 
 @Data
 @Entity
@@ -32,19 +30,20 @@ public class Patron {
     @Column(name = "last_name", length = 100, nullable = false)
     private String lastName;
 
-    @Column(name = "email", length = 150, nullable = false, unique = true , updatable = false)
+    @Column(name = "email", length = 150, nullable = false, unique = true, updatable = false)
     private String email;
     @NumberFormat
     @Column(name = "phone_number", length = 15)
     private String phoneNumber;
 
-//    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
+    //    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "dd/MM/yyyy")
     @Column(name = "membership_date", nullable = false)
     @DateTimeFormat(pattern = "dd/mm/yyyy")
     private LocalDate membershipDate;
+
     @PrePersist
-    protected void onCreate(){
-        if (membershipDate == null){
+    protected void onCreate() {
+        if (membershipDate == null) {
             membershipDate = LocalDate.now();
         }
     }

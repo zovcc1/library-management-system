@@ -13,6 +13,7 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
 import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 @DataJpaTest
 class BookRepositoryTest {
@@ -49,18 +50,18 @@ class BookRepositoryTest {
 
         // then
         assertEquals(isbn, foundBook.getIsbn());
-        assertEquals(title , foundBook.getTitle());
+        assertEquals(title, foundBook.getTitle());
 
     }
 
     @Test
     void findByIsbn() {
         // given
-          String isbn = "1234" ;
-          //when
-        Book existingBook  = bookRepository.findByIsbn(isbn).orElseThrow();
+        String isbn = "1234";
+        //when
+        Book existingBook = bookRepository.findByIsbn(isbn).orElseThrow();
         //then
-        assertEquals(isbn , existingBook.getIsbn());
+        assertEquals(isbn, existingBook.getIsbn());
 
     }
 }

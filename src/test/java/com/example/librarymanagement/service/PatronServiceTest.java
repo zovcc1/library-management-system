@@ -5,14 +5,12 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.boot.test.context.SpringBootTest;
 
 import java.time.LocalDate;
 
-import static org.junit.jupiter.api.Assertions.*;
 @DataJpaTest
 class PatronServiceTest {
-     private PatronService patronService;
+    private PatronService patronService;
 
     @BeforeEach
     void setUp() {
@@ -21,7 +19,7 @@ class PatronServiceTest {
         patron.setLastName("alchikh ali");
         patron.setPhoneNumber("0991951404");
         patron.setEmail("qassemmohammedli@gmail.com");
-        patron.setMembershipDate(LocalDate.of(2020 , 1 ,1));
+        patron.setMembershipDate(LocalDate.of(2020, 1, 1));
 
 
     }
