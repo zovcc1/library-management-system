@@ -7,6 +7,8 @@ import com.example.librarymanagement.exception.BookNotFoundException;
 import com.example.librarymanagement.repository.BookRepository;
 import jakarta.transaction.Transactional;
 import org.modelmapper.ModelMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -17,12 +19,19 @@ import java.util.stream.Collectors;
 @Transactional
 public class BookService {
 
+    private static final Logger log = LoggerFactory.getLogger(BookService.class);
     private final BookRepository bookRepository;
     private final ModelMapper modelMapper;
 
     public BookService(BookRepository bookRepository, ModelMapper modelMapper) {
         this.bookRepository = bookRepository;
         this.modelMapper = modelMapper;
+    }
+    private Book DtoToBook(BookDto bookDto){
+        return modelMapper.map(bookDto , Book.class);
+    }
+    private BookDto bookToDto(Book book){
+        return modelMapper.map(book , BookDto.class);
     }
 
     public List<BookDto> findAllBooks() {
@@ -49,19 +58,34 @@ public class BookService {
     }
 
     public BookDto updateBook(Long id, BookDto bookDto) {
+        // Step 1: Validate input parameters
+        if (id == null || bookDto == null) {
+            throw new IllegalArgumentException("Invalid input parameters.");
+        }
+
+        // Step 2: Find the existing book by ID
         Book existingBook = bookRepository.findById(id)
                 .orElseThrow(() -> new BookNotFoundException("Book not found with id: " + id));
 
-        // Check if there's another book with the same ISBN
+        // Step 3: Check if there's another book with the same ISBN
         Optional<Book> bookWithSameIsbn = bookRepository.findByIsbn(bookDto.getIsbn());
         if (bookWithSameIsbn.isPresent() && !bookWithSameIsbn.get().getId().equals(id)) {
             throw new BookAlreadyExistsException("A book with the same ISBN already exists.");
         }
 
-        modelMapper.map(bookDto, existingBook);
+        // Step 4: Update the existing book fields
+        existingBook.setTitle(bookDto.getTitle());
+        existingBook.setAuthor(bookDto.getAuthor());
+        existingBook.setIsbn(bookDto.getIsbn());
+        existingBook.setPublicationDate(bookDto.getPublicationDate());
         Book updatedBook = bookRepository.save(existingBook);
-        return modelMapper.map(updatedBook, BookDto.class);
+        // Step 5: Save the updated book
+
+        // Step 6: Map the updated book to a DTO and return it
+        return this.bookToDto(updatedBook);
     }
+
+
 
     public void deleteBook(Long id) {
         if (!bookRepository.existsById(id)) {
