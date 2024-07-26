@@ -6,7 +6,6 @@ import com.example.librarymanagement.exception.NoPatronFoundException;
 import com.example.librarymanagement.exception.PatronAlreadyExistsException;
 import com.example.librarymanagement.mapper.PatronMapper;
 import com.example.librarymanagement.repository.PatronRepository;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -36,7 +35,7 @@ public class PatronService {
         return patronMapper.toDto(patron);
     }
 
-    public PatronDto addPatron( PatronDto patronDto) {
+    public PatronDto addPatron(PatronDto patronDto) {
         Optional<Patron> existingPatron = patronRepository.findByPhoneNumberAndEmail(patronDto.getPhoneNumber(), patronDto.getEmail());
         if (existingPatron.isPresent()) {
             throw new PatronAlreadyExistsException("Patron already found with the same number or email.");
@@ -49,20 +48,16 @@ public class PatronService {
         return patronMapper.toDto(newPatron);
     }
 
-/*
-*
-*
-* */
+
     public PatronDto updatePatron(Long id, PatronDto patronDto) {
-        Patron existingPatron = patronRepository.findById(id)
-                .orElseThrow(()->new NoPatronFoundException("Patron with id "+ id + " is not existed"));
+        Optional<Patron> existingPatronOpt = patronRepository.findById(id);
 
-        existingPatron.setFirstName(patronDto.getFirstName());
-        existingPatron.setLastName(patronDto.getLastName());
-        existingPatron.setEmail(patronDto.getEmail());
-        existingPatron.setPhoneNumber(patronDto.getPhoneNumber());
+        if (existingPatronOpt.isEmpty()) {
+            throw new NoPatronFoundException("Can't be updated, patron with id:" + id + " not found");
+        }
 
-
+        Patron existingPatron = existingPatronOpt.get();
+        patronMapper.toEntity(patronDto);
 
         Patron updatedPatron = patronRepository.save(existingPatron);
         return patronMapper.toDto(updatedPatron);
