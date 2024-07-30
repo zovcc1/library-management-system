@@ -4,8 +4,9 @@ import com.example.librarymanagement.dto.PatronDto;
 import com.example.librarymanagement.entity.Patron;
 import com.example.librarymanagement.exception.NoPatronFoundException;
 import com.example.librarymanagement.exception.PatronAlreadyExistsException;
+import com.example.librarymanagement.mapper.PatronMapper;
 import com.example.librarymanagement.repository.PatronRepository;
-import org.modelmapper.ModelMapper;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -15,52 +16,56 @@ import java.util.stream.Collectors;
 @Service
 public class PatronService {
 
-    private final PatronRepository patronRepository;
-    private final ModelMapper modelMapper;
+    private  final PatronRepository patronRepository;
+    private final PatronMapper patronMapper;
 
-    public PatronService(PatronRepository patronRepository, ModelMapper modelMapper) {
+    public PatronService(PatronRepository patronRepository, PatronMapper patronMapper) {
         this.patronRepository = patronRepository;
-        this.modelMapper = modelMapper;
+        this.patronMapper = patronMapper;
     }
 
     public List<PatronDto> findAllPatrons() {
         List<Patron> patrons = patronRepository.findAll();
-        return patrons.stream().map(patron -> modelMapper.map(patron, PatronDto.class))
+        return patrons.stream().map(patronMapper::toDto)
                 .collect(Collectors.toList());
     }
 
     public PatronDto findPatronById(Long id) {
         Patron patron = patronRepository.findById(id)
                 .orElseThrow(() -> new NoPatronFoundException("No patron found with id: " + id));
-        return modelMapper.map(patron, PatronDto.class);
+        return patronMapper.toDto(patron);
     }
 
-    public PatronDto addPatron(PatronDto patronDto) {
+    public PatronDto addPatron( PatronDto patronDto) {
         Optional<Patron> existingPatron = patronRepository.findByPhoneNumberAndEmail(patronDto.getPhoneNumber(), patronDto.getEmail());
         if (existingPatron.isPresent()) {
             throw new PatronAlreadyExistsException("Patron already found with the same number or email.");
         }
 
-        Patron newPatron = modelMapper.map(patronDto, Patron.class);
+        Patron newPatron = patronMapper.toEntity(patronDto);
 
-        newPatron = patronRepository.save(newPatron);
+        patronRepository.save(newPatron);
 
-        return modelMapper.map(newPatron, PatronDto.class);
+        return patronMapper.toDto(newPatron);
     }
 
-
+/*
+*
+*
+* */
     public PatronDto updatePatron(Long id, PatronDto patronDto) {
-        Optional<Patron> existingPatronOpt = patronRepository.findById(id);
+        Patron existingPatron = patronRepository.findById(id)
+                .orElseThrow(()->new NoPatronFoundException("Patron with id "+ id + " is not existed"));
 
-        if (existingPatronOpt.isEmpty()) {
-            throw new NoPatronFoundException("Can't be updated, patron with id:" + id + " not found");
-        }
+        existingPatron.setFirstName(patronDto.getFirstName());
+        existingPatron.setLastName(patronDto.getLastName());
+        existingPatron.setEmail(patronDto.getEmail());
+        existingPatron.setPhoneNumber(patronDto.getPhoneNumber());
 
-        Patron existingPatron = existingPatronOpt.get();
-        modelMapper.map(patronDto, existingPatron);
+
 
         Patron updatedPatron = patronRepository.save(existingPatron);
-        return modelMapper.map(updatedPatron, PatronDto.class);
+        return patronMapper.toDto(updatedPatron);
     }
 
     public void deletePatron(Long id) {
