@@ -7,6 +7,7 @@ import org.mapstruct.Mapper;
 @Mapper(componentModel = "spring")
 public interface PatronMapper {
     Patron toEntity(PatronDto dto);
+
     PatronDto toDto(Patron entity);
 
 }

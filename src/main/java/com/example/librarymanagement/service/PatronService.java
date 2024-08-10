@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
 @Service
 public class PatronService {
 
-    private  final PatronRepository patronRepository;
+    private final PatronRepository patronRepository;
     private final PatronMapper patronMapper;
 
     public PatronService(PatronRepository patronRepository, PatronMapper patronMapper) {

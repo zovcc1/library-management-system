@@ -7,8 +7,6 @@ import com.example.librarymanagement.exception.BookNotFoundException;
 import com.example.librarymanagement.mapper.BookMapper;
 import com.example.librarymanagement.repository.BookRepository;
 import jakarta.transaction.Transactional;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -19,13 +17,14 @@ import java.util.stream.Collectors;
 @Transactional
 public class BookService {
 
-    private static final Logger log = LoggerFactory.getLogger(BookService.class);
+    //    private static final Logger log = LoggerFactory.getLogger(BookService.class);
     private final BookRepository bookRepository;
     private final BookMapper bookMapper;
 
     public BookService(BookRepository bookRepository, BookMapper bookMapper) {
         this.bookRepository = bookRepository;
         this.bookMapper = bookMapper;
+
     }
 
 
@@ -79,7 +78,6 @@ public class BookService {
         // Step 6: Map the updated book to a DTO and return it
         return bookMapper.toDto(updatedBook);
     }
-
 
 
     public void deleteBook(Long id) {

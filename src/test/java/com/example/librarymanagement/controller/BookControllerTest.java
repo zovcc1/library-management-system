@@ -6,24 +6,19 @@ import com.example.librarymanagement.exception.BookAlreadyExistsException;
 import com.example.librarymanagement.exception.BookNotFoundException;
 import com.example.librarymanagement.mapper.BookMapper;
 import com.example.librarymanagement.service.BookService;
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.aot.DisabledInAotMode;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -34,20 +29,18 @@ import java.time.format.DateTimeFormatter;
 
 import static org.mockito.Mockito.*;
 
+@ContextConfiguration(classes = {BookController.class})
+@DisabledInAotMode
 @ExtendWith(MockitoExtension.class)
-@WebMvcTest(controllers = {BookController.class})
 class BookControllerTest {
 
-    @MockBean
+    @Mock
     private BookService bookService;
 
     @Mock
     private BookMapper bookMapper;
 
-    @Autowired
-    private HttpServletResponse httpServletResponse;
-
-    @Autowired
+    @InjectMocks
     private BookController bookController;
 
     private MockMvc mockMvc;
@@ -78,7 +71,6 @@ class BookControllerTest {
         mockMvc = MockMvcBuilders.standaloneSetup(bookController).build();
     }
 
-    /** Method under testing {@link BookController#addBook(BookDto)} */
     @Test
     void bookController_FindBookById_ShouldReturnFound() throws Exception {
         // Arrange
@@ -93,10 +85,6 @@ class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.content().contentType(MediaType.APPLICATION_JSON));
     }
 
-    /** Method under testing
-     * {@link BookController#findBookById(Long)}
-     * should return {@link HttpStatus#NOT_FOUND}
-     */
     @Test
     void bookController_FindBookById_ShouldReturnNotFound() throws Exception {
         // Arrange
@@ -110,7 +98,6 @@ class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
-    /** Method under testing {@link BookController#addBook(BookDto)} */
     @Test
     void bookController_AddBook_ShouldReturnCreated() throws Exception {
         // Arrange
@@ -178,20 +165,20 @@ class BookControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
 
-    // TODO: Implement the remaining tests
     @Test
     void bookController_UpdateBook_ShouldReturnConflict() throws Exception {
-    //Arrange
-    when(bookService.updateBook(Mockito.any() , Mockito.any())).thenThrow(new BookAlreadyExistsException("Book with same id exists"));
-    String content = objectMapper.writeValueAsString(bookDto);
-    //Act &Assert
-    MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/books/{id}" , 1L)
-            .contentType(MediaType.APPLICATION_JSON)
-            .content(content);
+        // Arrange
+        when(bookService.updateBook(Mockito.any(), Mockito.any())).thenThrow(new BookAlreadyExistsException("Book with same id exists"));
 
-    mockMvc.perform(requestBuilder)
-            .andExpect(MockMvcResultMatchers.status().isConflict());
+        String content = objectMapper.writeValueAsString(bookDto);
 
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.put("/api/books/{id}", 1L)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(content);
+
+        // Act & Assert
+        mockMvc.perform(requestBuilder)
+                .andExpect(MockMvcResultMatchers.status().isConflict());
     }
 
     @Test
@@ -210,7 +197,8 @@ class BookControllerTest {
         // Arrange
         doThrow(new BookNotFoundException("An error occurred")).when(bookService).deleteBook(Mockito.<Long>any());
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/books/{id}", 1L);
-       //Act & Assert
+
+        // Act & Assert
         mockMvc.perform(requestBuilder)
                 .andExpect(MockMvcResultMatchers.status().isNotFound());
     }
